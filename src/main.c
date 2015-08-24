@@ -14,8 +14,6 @@
 #include <linux/cdev.h>
 #include <linux/device.h>
 
-
-
 MODULE_DESCRIPTION("Try to collect information about memory usage");
 MODULE_AUTHOR("Aakarsh Nair"); 
 MODULE_LICENSE("GPL");
@@ -32,7 +30,6 @@ static int __init mmap_main_init_module (void)
 static void __exit mmap_main_cleanup_module (void) {
   printk("mmap_main_cleanup_module: Exit \n");
 }
-
 
 module_init(mmap_main_init_module);
 module_exit(mmap_main_cleanup_module);
