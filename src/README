@@ -1,0 +1,131 @@
+Description:
+
+  After building the kernel module, Loading the with insmod creates
+  two device files in /dev
+  
+  # make -k             # This will build the kernel module
+  # sudo ./run.sh       # This will insert the kernel module
+
+  # ls -al /dev | grep mmap_    # This will list the the to kerned device files
+  crw-------   1 root root    251,   0 Sep 19 16:10 mmap_kmalloc
+  crw-------   1 root root    251,   1 Sep 19 16:10 mmap_vmalloc
+  
+  # ls -al /proc | grep mmap_   # This will list the proc files that contain the contents of the mmaped memory
+  # -r--r--r--   1 root       root                0 Sep 19 16:13 mmap_kmalloc
+  # -r--r--r--   1 root       root                0 Sep 19 16:13 mmap_vmalloc
+
+  # cat /proc/mmap_kmalloc  ; echo ""  # This will show the memory in kmalloc device
+  012345789
+
+  # cat /proc/mmap_vmalloc  ; echo ""  # This will show the memory in vmalloc device
+  abcdefghijklmnopqrstuvwxy
+
+  # The following is sample output from syslog file.
+
+  Sep 19 16:08:23 minibovina kernel: [40404.567049] kmalloc_ptr at 0xeaa70000 
+    Sep 19 16:08:23 minibovina kernel: [40404.567059] kmalloc_area: 0xeaa70000
+    Sep 19 16:08:23 minibovina kernel: [40404.567063] kmalloc_area: 0xeaa70000
+    Sep 19 16:08:23 minibovina kernel: [40404.567069] kmalloc_area :0xeaa70000 	 physical Address 0x2aa70000)
+    Sep 19 16:08:23 minibovina kernel: [40404.567100] vmalloc_ptr at 0xf845b000 
+    Sep 19 16:08:23 minibovina kernel: [40404.567108] vmalloc_ptr: 0xf845b000
+    Sep 19 16:08:23 minibovina kernel: [40404.567114] vmalloc_ptr :0xf845b000 	 physical Address 0x3845b000)
+    Sep 19 16:09:26 minibovina kernel: [40467.735448] cleaning up module
+    Sep 19 16:09:26 minibovina kernel: [40467.735457] cleaning up module
+    Sep 19 16:09:26 minibovina kernel: [40467.735470] cleaning up module
+    Sep 19 16:10:41 minibovina kernel: [40543.235353] kmalloc_ptr at 0xeaa70000 
+    Sep 19 16:10:41 minibovina kernel: [40543.235362] kmalloc_area: 0xeaa70000
+    Sep 19 16:10:41 minibovina kernel: [40543.235367] kmalloc_area: 0xeaa70000
+    Sep 19 16:10:41 minibovina kernel: [40543.235373] kmalloc_area :0xeaa70000 	 physical Address 0x2aa70000)
+    Sep 19 16:10:41 minibovina kernel: [40543.235404] vmalloc_ptr at 0xf86e7000 
+    Sep 19 16:10:41 minibovina kernel: [40543.235412] vmalloc_ptr: 0xf86e7000
+    Sep 19 16:10:41 minibovina kernel: [40543.235418] vmalloc_ptr :0xf86e7000 	 physical Address 0x386e7000)
+
+
+Using the mmap_client:
+      
+    We can now use the mmap_client to read modify write these allocate buffers. Its usage is given by
+
+    sudo ./mmap_client -?
+    Usage: ./mmap_client  <options> 
+    -k        --kmalloc-buffer	Set target buffer to kmalloc-buffer
+    -v        --vmalloc-buffer	Set target buffer to vmalloc-buffer
+    -s        --input-string	Write input string into the buffer
+    -p        --print       	print the contents of target buffer
+    
+    
+    For example reading and modifying a vmalloc allocated buffer is given as follows.
+
+    # sudo ./mmap_client -pv
+    mptr is 0xb77a6000
+    ----vmalloc_buffer----
+    abcdefghijklmnopqrstuvwxy
+    ----------------------
+
+    $ sudo ./mmap_client -v -s "This is NOT test"
+    mptr is 0xb7715000
+    ----vmalloc_buffer----
+    abcdefghijklmnopqrstuvwxy
+    ----------------------
+
+    $ sudo ./mmap_client -pv 
+    mptr is 0xb76f2000
+    ----vmalloc_buffer----
+    This is NOT test
+    ----------------------
+
+
+    We can also see the details of the kmalloc allocated buffer
+
+    $ sudo ./mmap_client -pk
+    mptr is 0xb77c6000
+    ----kmalloc_buffer----
+    012345789
+    ----------------------
+
+    $ sudo ./mmap_client -k -s "Writing to kmalloc"
+    mptr is 0xb779b000
+    ----kmalloc_buffer----
+    012345789
+    ----------------------
+    Wrote to buffer
+
+    Thus now examining the kmalloc buffer we see string has been written.
+
+    $sudo ./mmap_client -pk
+    mptr is 0xb7792000
+    ----kmalloc_buffer----
+    Writing to kmalloc
+    ----------------------
+
+
+Assignment Check List:
+
+- Write a complete char driver that supports mmap.
+  
+  DONE
+
+- Write mmap method that mmap kmalloc memory to user 
+
+  DONE
+
+- Initialize driver memory by writing ascii values 0123456789
+
+  DONE
+
+- Read and write to the device memory from user application
+
+  DONE
+
+- Implement read_proc() (/proc) method to verify driver buffer
+  is initialized and modified correctly before and after
+  running a user mmap program.
+
+  DONE
+
+- Write a driver mmap method that checks the device minor
+  number open to decide type of kernel memory to map:
+  mmap_kmalloc or mmap_vmalloc.
+
+  DONE
+
+

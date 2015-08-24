@@ -1,0 +1,37 @@
+Assignment Tasks:
+
+- Write a complete char driver that supports mmap.
+  
+  DONE
+
+- Write mmap method that mmap kmalloc memory to user 
+
+  DONE
+
+- Initialize driver memory by writing ascii values 0123456789
+
+  DONE
+
+- Read and write to the device memory from user application
+
+  DONE
+  
+
+- Implement read_proc() (/proc) method to verify driver buffer
+  is initialized and modified correctly before and after
+  running a user mmap program.
+
+  DONE
+
+- Write a driver mmap method that checks the device minor
+  number open to decide type of kernel memory to map:
+  mmap_kmalloc or mmap_vmalloc.
+
+  DONE
+
+
+
+Program information:
+
+Improve the test program 
+        
