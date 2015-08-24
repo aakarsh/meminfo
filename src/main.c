@@ -18,18 +18,28 @@ MODULE_DESCRIPTION("Try to collect information about memory usage");
 MODULE_AUTHOR("Aakarsh Nair"); 
 MODULE_LICENSE("GPL");
 
+// Display in kilobyte
+#define NPAGES_KB(npages) (npages << (PAGE_SHIFT -10))
 
-static int __init mmap_main_init_module (void) 
+static int __init meminfo_main (void) 
 {
-  printk("mmap_main_init_module: Entry \n");
-  printk("mmap_main_init_module: Exit \n");	  
+  printk("meminfo_main: Entry \n");
+  
+  
+  printk("Total RAM : %ld\n",NPAGES_KB(totalram_pages)); 
+  printk("Total Pages: %ld\n",totalram_pages);
+  printk("Pages Size: %ld\n",PAGE_SIZE);
+
+  printk("Page Shift: %d\n",PAGE_SHIFT);
+
+  printk("meminfo_main: Exit \n");	  
   return 0;
 }
 
 
-static void __exit mmap_main_cleanup_module (void) {
-  printk("mmap_main_cleanup_module: Exit \n");
+static void __exit meminfo_cleanup_module (void) {
+  printk("meminfo_cleanup_module: Exit \n");
 }
 
-module_init(mmap_main_init_module);
-module_exit(mmap_main_cleanup_module);
+module_init(meminfo_main);
+module_exit(meminfo_cleanup_module);
